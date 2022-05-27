@@ -175,7 +175,7 @@ def paint():
             #? open('/data/board_latest.txt','a').write("%03x%03x"%(int(x),int(y))+col)
             lock.release()
 
-            # tokendb.append(token)
+            tokendb.append(token)
 
 
         # print(hex(int(x)),hex(int(y)))
