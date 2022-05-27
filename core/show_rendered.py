@@ -8,7 +8,7 @@ cntt=0
 
 pygame.init()
 screen=pygame.display.set_caption('preview')
-screen=pygame.display.set_mode([400,250])
+screen=pygame.display.set_mode([800,600])
 screen.fill([255,255,255])
 pygame.display.flip()
 
@@ -18,8 +18,8 @@ while True:
         st = f.readline(3)
         if st == '':
             break
-        x = cntt%400
-        y = int(cntt/400)
+        x = cntt%800
+        y = int(cntt/800)
         colr = st[0]
         colg = st[1]
         colb = st[2]

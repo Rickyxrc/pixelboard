@@ -1,12 +1,14 @@
 # 导入Flask类
-from flask import Flask,request
+from flask import Flask,request,render_template
 from colorama import init,Fore,Back,Style
 from time import sleep
 from requests import JSONDecodeError, session
 import json,colorama,datetime,os,shutil
 import threading
+from threading import Lock
+lock = Lock()
 # 实例化，可视为固定格式
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='/static')
 
 tokens = ['token1','1234567890abcdef']
 tokendb = []
@@ -21,15 +23,17 @@ def clears():
         tokendb=[]
         sleep(__config_paint_time)
 
-def copying_daemon():
-    global __config_backup_time
+def rendering_daemon():
+    global __config_backup_time,__config_flush_time
     while True:
+        print("rander-")
         # print(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
 
         # os.remove('./data/board_rendered.txt')
 
         #? file render.
 
+        lock.acquire()
         tf = open("./data/board_latest.txt","r")
         tfw = open("./data/board_rendered.txt","w")
         
@@ -62,16 +66,24 @@ def copying_daemon():
                 # print(tmp[i][j],end='')
                 tfw.write(tmp[i][j])
         tfw.close()
+        lock.release()
 
-        #? file render. end
+        sleep(__config_flush_time)
 
+
+
+def copying_daemon():
+    while True:
+        lock.acquire()
         shutil.copyfile("./data/board_rendered.txt","./data/"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")+".txt")
-
+        lock.release()
         sleep(__config_backup_time)
+
 
 
 def pre_load_config():
     global __config
+    lock.acquire()
     try:
         f = open('/data/.config','r')
     except FileNotFoundError:
@@ -79,6 +91,7 @@ def pre_load_config():
             f = open('.tmpconfigremoveme','r')
         except FileNotFoundError:
             raise_fault("ERROR:config file not found!")
+    lock.release()
 
     try:
         __config = json.loads(f.read())
@@ -87,12 +100,13 @@ def pre_load_config():
 
 def load_config():
     pre_load_config()
-    global __config_max_x,__config_max_y,__config_backup_time,__config_paint_time
+    global __config_max_x,__config_max_y,__config_backup_time,__config_paint_time,__config_flush_time
     try:
         __config_max_x = __config['map']['x']
         __config_max_y = __config['map']['y']
         __config_backup_time = __config['backup']
         __config_paint_time = __config['painttime']
+        __config_flush_time = __config['flushtime']
     except KeyError:
         raise_fault("ERROR:some config don't exist!")
 
@@ -154,13 +168,14 @@ def paint():
                 status=0
 
         if status==1:
-            # print("%04x%04x"%(int(x),int(y))+col)
+            lock.acquire()
             #! CHANGE IT INTO PRODUCT
             open('./data/board_latest.txt','a').write("%03x%03x"%(int(x),int(y))+col)
             #! PRODUCT
             #? open('/data/board_latest.txt','a').write("%03x%03x"%(int(x),int(y))+col)
+            lock.release()
 
-            tokendb.append(token)
+            # tokendb.append(token)
 
 
         # print(hex(int(x)),hex(int(y)))
@@ -171,23 +186,34 @@ def paint():
     return str({"code":0,"success":status})
 
 
-# @app.route('/checktoken',methods=['GET', 'POST'])
-# def checktoken():
-#     if request.method == "GET":
-#         paras = request.args
-#     elif request.method == "POST":
-#         paras = request.form
-#     paras = paras.to_dict()
+@app.route('/checktoken',methods=['GET', 'POST'])
+def checktoken():
+    if request.method == "GET":
+        paras = request.args
+    elif request.method == "POST":
+        paras = request.form
+    paras = paras.to_dict()
 
-#     try:
-#         st = __checktoken(paras['token'])
-#         return str({"code":0,"status":st})
-#     except KeyError:
-#         return str({"code":-1,"desc":"value incorrect"})
+    try:
+        st = __checktoken(paras['token'])
+        return str({"code":0,"status":st})
+    except KeyError:
+        return str({"code":-1,"desc":"value incorrect"})
 
 @app.route('/board',methods=['GET', 'POST'])
 def board():
-    return open('./data/board_rendered.txt','r').read()
+    lock.acquire()
+    f = open('./data/board_rendered.txt','r').read()
+    lock.release()
+    return f
+
+@app.route('/',methods=['GET', 'POST'])
+def serve():
+    return render_template('./index.html')
+
+@app.errorhandler(404)
+def reactwhen404(error):
+    return render_template('./404.html'), 404
 
 if __name__ == '__main__':
     load_config()
@@ -195,6 +221,10 @@ if __name__ == '__main__':
     copyingdaemon = threading.Thread(target=copying_daemon)
     copyingdaemon.setDaemon(True)
     copyingdaemon.start()
+
+    flushingdaemon = threading.Thread(target=rendering_daemon)
+    flushingdaemon.setDaemon(True)
+    flushingdaemon.start()
 
     sessionclean = threading.Thread(target=clears)
     sessionclean.setDaemon(True)

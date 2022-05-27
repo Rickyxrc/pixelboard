@@ -4,7 +4,7 @@ cnt = 0
 
 pygame.init()
 screen=pygame.display.set_caption('preview')
-screen=pygame.display.set_mode([400,250])
+screen=pygame.display.set_mode([800,600])
 screen.fill([255,255,255])
 pygame.display.flip()
 

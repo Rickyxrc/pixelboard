@@ -4,9 +4,6 @@
 			"path": "core"
 		},
 		{
-			"path": "frontend"
-		},
-		{
 			"path": "nginx-conf"
 		}
 	],

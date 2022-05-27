@@ -1,8 +1,9 @@
 {
     "map":{
-        "x":400,
-        "y":250
+        "x":800,
+        "y":600
     },
     "backup":600,
+    "flushtime":10,
     "painttime":120
 }
