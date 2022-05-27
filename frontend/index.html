@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/app.min.css">
+    <script src="/assets/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="/assets/js/app.min.js"></script>
+</head>
+<style>
+    @keyframes floattingin {
+        0%{transform: translateY(70px);opacity: 0;transform: scale(0.9);}
+        100%{transform: translateY(0);}
+    }
+    .leftdown{
+        position: fixed;
+        width: 100vw;
+        left:2vw;
+        bottom: 120px;
+        animation: floattingin 1s;
+    }
+</style>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="float-start navbar-brand mb-0 h1">
+                <img src="/assets/img/pixelboard.png" style="width: 32px;" alt="" srcset="">
+                <span>pixelboard</span>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <canvas class="justify-content-center" id="canvas_main" width="400" height="250" style="border:1px solid #000000;">
+            您的浏览器不支持 canvas 标签,可以试试chrome
+        </canvas>
+    </div>
+
+    <div class="row leftdown">
+        <div class="col-md-3 col-sm-8">
+            <div class="card ribbon-box" id="proj">
+                <div class="card-body">
+                    <div class="ribbon ribbon-success float-start"><i class="mdi mdi-access-point me-1"></i> 欢迎！</div>
+                    <h5 class="text-success float-end mt-0">
+                        欢迎来到这个全新的项目！
+                        <button type="button" class="btn-close" aria-label="Close" onclick="deletebox('#proj')"></button>
+                    </h5>
+                    <div class="ribbon-content">
+                        实际上,这个项目正处于开发阶段,需要大家的帮助.<br>
+                        可以在<a href="https://github.com/rickyxrc/pixelboard" class="btn-link">这里</a>参与项目的贡献。<br>
+                        或者<a href="https://afdian.net/@rickyxrc" class="btn-link">请我喝杯咖啡</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card ribbon-box" id="proj2">
+                <div class="card-body">
+                    <div class="ribbon ribbon-primary float-start"><i class="mdi mdi-access-point me-1"></i> 欢迎！</div>
+                    <h5 class="text-primary float-end mt-0">
+                        注意事项
+                        <button type="button" class="btn-close" aria-label="Close" onclick="deletebox('#proj2')"></button>
+                    </h5>
+                    <div class="ribbon-content">
+                        这个页面会自动刷新。为节省服务器流量,请不要频繁刷新页面。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function deletebox(select){
+            var leftdown=document.querySelector(select);
+            leftdown.remove();
+        }
+        // function puxpixel(x,y,col){
+        //     var c=document.getElementById("canvas_main");
+        //     var ctx=c.getContext("2d");
+        //     ctx.fillStyle="#FF0000";
+        //     ctx.fillRect(0,0,150,75);
+        // }
+    </script>
+</body>
+</html>
